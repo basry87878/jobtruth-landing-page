@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobTruth — Know if that job actually made you money</title>
+<meta name="description" content="Estimates are easy. Knowing whether you profited is not. Track real job costs and see your true profit per job. Built for the guy with a van and a toolbox. $19/mo.">
+<style>
+  :root {
+    --ink: #1a1f24;
+    --paper: #f7f5f0;
+    --card: #ffffff;
+    --accent: #e8622c;
+    --accent-dark: #c94e1f;
+    --good: #2e7d4f;
+    --bad: #b3382e;
+    --muted: #5c6670;
+    --line: #e3ded4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+
+  /* Hero */
+  .hero { padding: 56px 0 36px; }
+  .badge {
+    display: inline-block;
+    background: #fdeee5;
+    color: var(--accent-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(2rem, 6.5vw, 2.9rem);
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+  .sub { font-size: 1.12rem; color: var(--muted); max-width: 560px; margin-bottom: 28px; }
+
+  /* Email form */
+  .signup {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 14px;
+  }
+  .signup p { font-weight: 700; margin-bottom: 12px; }
+  .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .form-row input {
+    flex: 1;
+    min-width: 200px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+  .form-row input:focus { outline: none; border-color: var(--accent); }
+  .form-row button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .form-row button:hover { background: var(--accent-dark); }
+  .fine { font-size: 0.82rem; color: var(--muted); margin-top: 10px; }
+  .trust { font-size: 0.85rem; color: var(--muted); margin-bottom: 48px; }
+
+  /* How it works */
+  section { padding: 40px 0; }
+  h2 { font-size: 1.55rem; letter-spacing: -0.5px; margin-bottom: 24px; }
+  .steps { display: grid; gap: 16px; }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .step .num {
+    display: inline-block;
+    width: 30px; height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  .step h3 { font-size: 1.08rem; margin-bottom: 6px; }
+  .step p { color: var(--muted); font-size: 0.96rem; }
+
+  /* Profit demo card */
+  .demo {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 16px;
+  }
+  .demo h3 { font-size: 1.05rem; margin-bottom: 14px; color: #cfd6dd; font-weight: 600; }
+  .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333c44; font-size: 0.98rem; }
+  .row:last-of-type { border-bottom: none; }
+  .neg { color: #ff8a7a; font-weight: 700; }
+  .pos { color: #7fd6a2; font-weight: 700; }
+  .verdict {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(179,56,46,0.18);
+    border-left: 3px solid var(--bad);
+    border-radius: 8px;
+    font-weight: 700;
+  }
+
+  /* Not this */
+  .notlist { list-style: none; }
+  .notlist li {
+    padding: 12px 0 12px 34px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    font-size: 1.02rem;
+  }
+  .notlist li::before {
+    content: "✕";
+    position: absolute;
+    left: 4px;
+    color: var(--bad);
+    font-weight: 800;
+  }
+  .poslist { list-style: none; margin-top: 24px; }
+  .poslist li {
+    padding: 12px 0 12px 34px;
+    position: relative;
+    font-size: 1.02rem;
+  }
+  .poslist li::before {
+    content: "✓";
+    position: absolute;
+    left: 4px;
+    color: var(--good);
+    font-weight: 800;
+  }
+
+  /* Price */
+  .price-card {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+  }
+  .price-card .amount { font-size: 3rem; font-weight: 800; letter-spacing: -2px; }
+  .price-card .per { color: var(--muted); margin-bottom: 16px; }
+  .price-note { font-size: 0.88rem; color: var(--muted); margin-top: 14px; }
+
+  footer {
+    padding: 36px 0 48px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+  }
+  @media (min-width: 640px) {
+    .steps { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">JobTruth<span>.</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Built for one-man shops</div>
+    <h1>Find out if that job actually made you money.</h1>
+    <p class="sub">Estimates are easy. Knowing whether you <em>profited</em> is not. Track what each job really cost — materials, labor hours, surprises — and see your real profit per job, not your gut feeling.</p>
+
+    <div class="signup">
+      <p>Get early access — first month free for the first 50 contractors.</p>
+      <!-- Replace the form action with your Formspree/Basin endpoint.
+           Free option: create a form at https://formspree.io (free tier, no backend needed),
+           then paste your endpoint URL in action="" below. -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-row">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <input type="hidden" name="trade" value="early-access">
+          <button type="submit">Join the list</button>
+        </div>
+      </form>
+      <p class="fine">No card. No spam. One email when it opens — that's it.</p>
+    </div>
+    <p class="trust">Joining from r/Contractor or a trade group? Tell us your trade in the form's hidden field above if you customize it.</p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section>
+    <h2>Three things. Done right. Nothing else.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Send professional estimates</h3>
+        <p>In minutes — materials, labor, and markup calculated for you. Looks like the big guys, priced for the little guy.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Log costs as the job runs</h3>
+        <p>Snap a photo of the supply-house receipt, track labor hours, note the extra trip you didn't charge for.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>See the truth after every job</h3>
+        <p>Not a gut feeling. A number. And over time: which job types actually make you money.</p>
+      </div>
+    </div>
+
+    <div class="demo">
+      <h3>What you'll see when the job closes:</h3>
+      <div class="row"><span>Kitchen remodel — estimated</span><span>$1,824.00</span></div>
+      <div class="row"><span>Materials (actual receipts)</span><span>$1,231.40</span></div>
+      <div class="row"><span>Labor — 26 hrs actual vs 18 est.</span><span>$678.00</span></div>
+      <div class="row"><span>Extra supply run + disposal fee</span><span>$60.00</span></div>
+      <div class="row"><span>Actual job cost</span><span class="neg">$1,969.40</span></div>
+      <div class="verdict">You lost $145.40 on this job. Want to know <em>why</em>? It was the labor hours — and it's the third job this month where that happened.</div>
+    </div>
+  </section>
+
+  <!-- WHAT IT'S NOT -->
+  <section>
+    <h2>What it deliberately is NOT</h2>
+    <ul class="notlist">
+      <li>No scheduling or dispatching</li>
+      <li>No CRM, no marketing automation, no GPS tracking</li>
+      <li>No 50 features you'll never touch</li>
+      <li>No "call us for pricing" — it's $19, that's the price</li>
+    </ul>
+    <ul class="poslist">
+      <li>Built for the guy with a van and a toolbox — not a 20-truck fleet</li>
+      <li>Estimates <em>plus</em> profit tracking, at a price the $150/mo platforms can't touch</li>
+      <li>Works on your phone, in the truck, between jobs</li>
+    </ul>
+  </section>
+
+  <!-- PRICE -->
+  <section>
+    <div class="price-card">
+      <div class="amount">$19</div>
+      <div class="per">per month · cancel anytime · first month free for early users</div>
+      <p>Cheaper than the spreadsheet mistakes it's going to catch.</p>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section>
+    <div class="signup">
+      <p>First 50 contractors get early access and a locked-in price.</p>
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-row">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Get early access</button>
+        </div>
+      </form>
+      <p class="fine">Still being built. Your email tells us to hurry up on your trade.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><strong>JobTruth.</strong> Estimates in, truth out.</p>
+    <p style="margin-top:6px">Questions? Email hello@jobtruth.example — a real person answers.</p>
+  </div>
+</footer>
+
+</body>
+</html>
