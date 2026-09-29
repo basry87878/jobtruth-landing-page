@@ -3,34 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JobTruth — Real Job Cost & Profit Tracking for Trade Contractors</title>
-<meta name="description" content="Lightweight job-costing tool for solo trade contractors. Track real job costs, log labor and materials, and see your true profit per job.">
-
-<!-- Tailwind CSS CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Font Awesome for Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          paper: '#f7f5f0',
-          ink: '#1a1f24',
-          accent: '#e8622c',
-          'accent-dark': '#c94e1f',
-          good: '#2e7d4f',
-          bad: '#b3382e',
-          muted: '#5c6670',
-          line: '#e3ded4',
-        }
-      }
-    }
-  }
-</script>
-
+<title>JobTruth — Know if that job actually made you money</title>
+<meta name="description" content="Estimates are easy. Knowing whether you profited is not. Track real job costs and see your true profit per job. Built for the guy with a van and a toolbox. $19/mo.">
 <style>
   :root {
     --ink: #1a1f24;
@@ -43,1056 +17,288 @@
     --muted: #5c6670;
     --line: #e3ded4;
   }
-  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background-color: var(--paper);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -webkit-tap-highlight-color: transparent;
+    line-height: 1.6;
   }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
 
-  /* Custom scrollbar for mobile usability */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Header */
+  header {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
   }
-  ::-webkit-scrollbar-thumb {
-    background: #c5bfb4;
+  .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+
+  /* Hero */
+  .hero { padding: 56px 0 36px; }
+  .badge {
+    display: inline-block;
+    background: #fdeee5;
+    color: var(--accent-dark);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 12px;
     border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(2rem, 6.5vw, 2.9rem);
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+  }
+  .sub { font-size: 1.12rem; color: var(--muted); max-width: 560px; margin-bottom: 28px; }
+
+  /* Email form */
+  .signup {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 14px;
+  }
+  .signup p { font-weight: 700; margin-bottom: 12px; }
+  .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .form-row input {
+    flex: 1;
+    min-width: 200px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+  .form-row input:focus { outline: none; border-color: var(--accent); }
+  .form-row button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .form-row button:hover { background: var(--accent-dark); }
+  .fine { font-size: 0.82rem; color: var(--muted); margin-top: 10px; }
+  .trust { font-size: 0.85rem; color: var(--muted); margin-bottom: 48px; }
+
+  /* How it works */
+  section { padding: 40px 0; }
+  h2 { font-size: 1.55rem; letter-spacing: -0.5px; margin-bottom: 24px; }
+  .steps { display: grid; gap: 16px; }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .step .num {
+    display: inline-block;
+    width: 30px; height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  .step h3 { font-size: 1.08rem; margin-bottom: 6px; }
+  .step p { color: var(--muted); font-size: 0.96rem; }
+
+  /* Profit demo card */
+  .demo {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 16px;
+  }
+  .demo h3 { font-size: 1.05rem; margin-bottom: 14px; color: #cfd6dd; font-weight: 600; }
+  .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333c44; font-size: 0.98rem; }
+  .row:last-of-type { border-bottom: none; }
+  .neg { color: #ff8a7a; font-weight: 700; }
+  .pos { color: #7fd6a2; font-weight: 700; }
+  .verdict {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(179,56,46,0.18);
+    border-left: 3px solid var(--bad);
+    border-radius: 8px;
+    font-weight: 700;
   }
 
-  /* Touch responsive feedback */
-  .touch-active:active {
-    transform: scale(0.98);
+  /* Not this */
+  .notlist { list-style: none; }
+  .notlist li {
+    padding: 12px 0 12px 34px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    font-size: 1.02rem;
+  }
+  .notlist li::before {
+    content: "✕";
+    position: absolute;
+    left: 4px;
+    color: var(--bad);
+    font-weight: 800;
+  }
+  .poslist { list-style: none; margin-top: 24px; }
+  .poslist li {
+    padding: 12px 0 12px 34px;
+    position: relative;
+    font-size: 1.02rem;
+  }
+  .poslist li::before {
+    content: "✓";
+    position: absolute;
+    left: 4px;
+    color: var(--good);
+    font-weight: 800;
   }
 
-  /* Toast notification animation */
-  @keyframes slideUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  /* Price */
+  .price-card {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
   }
-  .animate-slide-up {
-    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .price-card .amount { font-size: 3rem; font-weight: 800; letter-spacing: -2px; }
+  .price-card .per { color: var(--muted); margin-bottom: 16px; }
+  .price-note { font-size: 0.88rem; color: var(--muted); margin-top: 14px; }
+
+  footer {
+    padding: 36px 0 48px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+    margin-top: 40px;
+  }
+  @media (min-width: 640px) {
+    .steps { grid-template-columns: repeat(3, 1fr); }
   }
 </style>
 </head>
-<body class="min-h-screen flex flex-col pb-24 md:pb-8">
+<body>
 
-<!-- HEADER / NAVBAR -->
-<header class="bg-[#ffffff] border-b border-line sticky top-0 z-30 shadow-sm">
-  <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center space-x-2">
-      <div class="logo font-extrabold text-xl tracking-tight text-ink flex items-center">
-        JobTruth<span class="text-accent text-2xl leading-none">.</span>
-      </div>
-      <span class="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 bg-orange-100 text-accent-dark rounded-full">Solo Trade Edition</span>
-    </div>
-
-    <!-- Desktop Navigation Tabs -->
-    <nav class="hidden md:flex space-x-1">
-      <button onclick="switchTab('jobs')" id="tab-btn-jobs" class="nav-btn px-3 py-2 rounded-lg font-bold text-sm transition-all text-accent bg-orange-50">
-        <i class="fa-solid fa-receipt mr-1.5"></i> Active Jobs & Truth
-      </button>
-      <button onclick="switchTab('estimate')" id="tab-btn-estimate" class="nav-btn px-3 py-2 rounded-lg font-bold text-sm transition-all text-muted hover:text-ink">
-        <i class="fa-solid fa-plus-circle mr-1.5"></i> New Estimate
-      </button>
-      <button onclick="switchTab('log')" id="tab-btn-log" class="nav-btn px-3 py-2 rounded-lg font-bold text-sm transition-all text-muted hover:text-ink">
-        <i class="fa-solid fa-bolt mr-1.5"></i> Log Expense
-      </button>
-      <button onclick="switchTab('insights')" id="tab-btn-insights" class="nav-btn px-3 py-2 rounded-lg font-bold text-sm transition-all text-muted hover:text-ink">
-        <i class="fa-solid fa-chart-pie mr-1.5"></i> Profit Insights
-      </button>
-    </nav>
-
-    <!-- Quick Reset Button -->
-    <button onclick="confirmResetData()" title="Reset to Sample Data" class="text-muted hover:text-bad text-xs font-semibold flex items-center gap-1 bg-paper px-2.5 py-1.5 rounded-md border border-line">
-      <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">Reset Demo</span>
-    </button>
+<header>
+  <div class="wrap">
+    <div class="logo">JobTruth<span>.</span></div>
   </div>
 </header>
 
-<!-- MAIN CONTENT WRAPPER -->
-<main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full">
+<div class="wrap">
 
-  <!-- TAB 1: ACTIVE JOBS & THE TRUTH ENGINE -->
-  <section id="view-jobs" class="tab-content space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-extrabold text-ink tracking-tight">Active Jobs & Profit Truth</h1>
-        <p class="text-muted text-sm">Real cost tracking vs your initial estimates.</p>
-      </div>
-      
-      <!-- Filter Controls -->
-      <div class="flex bg-white p-1 rounded-xl border border-line self-start sm:self-auto text-xs font-bold">
-        <button onclick="setJobFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-lg bg-ink text-white transition-all">All Jobs</button>
-        <button onclick="setJobFilter('Active')" id="filter-active" class="px-3 py-1.5 rounded-lg text-muted hover:text-ink transition-all">Active</button>
-        <button onclick="setJobFilter('Completed')" id="filter-completed" class="px-3 py-1.5 rounded-lg text-muted hover:text-ink transition-all">Completed</button>
-      </div>
-    </div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">Built for one-man shops</div>
+    <h1>Find out if that job actually made you money.</h1>
+    <p class="sub">Estimates are easy. Knowing whether you <em>profited</em> is not. Track what each job really cost — materials, labor hours, surprises — and see your real profit per job, not your gut feeling.</p>
 
-    <!-- Quick Stats Overview Bar -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div class="bg-white p-3.5 rounded-xl border border-line">
-        <div class="text-xs text-muted font-medium">Total Revenue Est.</div>
-        <div id="stat-est-rev" class="text-lg font-extrabold text-ink">$0.00</div>
-      </div>
-      <div class="bg-white p-3.5 rounded-xl border border-line">
-        <div class="text-xs text-muted font-medium">Actual Costs Logged</div>
-        <div id="stat-actual-cost" class="text-lg font-extrabold text-ink">$0.00</div>
-      </div>
-      <div class="bg-white p-3.5 rounded-xl border border-line">
-        <div class="text-xs text-muted font-medium">Net True Profit</div>
-        <div id="stat-net-profit" class="text-lg font-extrabold text-good">$0.00</div>
-      </div>
-      <div class="bg-white p-3.5 rounded-xl border border-line">
-        <div class="text-xs text-muted font-medium">Avg Profit Margin</div>
-        <div id="stat-avg-margin" class="text-lg font-extrabold text-ink">0%</div>
-      </div>
-    </div>
-
-    <!-- Jobs Container -->
-    <div id="jobs-container" class="space-y-4">
-      <!-- Dynamic Job Cards render here -->
-    </div>
-  </section>
-
-
-  <!-- TAB 2: CREATE NEW ESTIMATE -->
-  <section id="view-estimate" class="tab-content hidden space-y-6">
-    <div class="max-w-2xl mx-auto">
-      <div class="mb-6">
-        <h1 class="text-2xl font-extrabold text-ink tracking-tight">Create & Send Job Estimate</h1>
-        <p class="text-muted text-sm">Calculate materials, labor hours, and your profit markup before bidding.</p>
-      </div>
-
-      <form id="estimate-form" onsubmit="handleCreateEstimate(event)" class="bg-white p-6 rounded-2xl border border-line space-y-5 shadow-sm">
-        
-        <!-- Client & Job Meta -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Client Name *</label>
-            <input type="text" id="est-client" required placeholder="e.g. John Doe / Oak Street" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Job Title / Name *</label>
-            <input type="text" id="est-title" required placeholder="e.g. Master Bath Plumbing Rough-In" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm">
-          </div>
+    <div class="signup">
+      <p>Get early access — first month free for the first 50 contractors.</p>
+      <form action="https://formspree.io/f/xdekbdve" method="POST">
+        <div class="form-row">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <input type="hidden" name="trade" value="early-access">
+          <button type="submit">Join the list</button>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Trade Category *</label>
-            <select id="est-trade" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm bg-white">
-              <option value="Plumbing">Plumbing 🚿</option>
-              <option value="Electrical">Electrical ⚡</option>
-              <option value="HVAC">HVAC ❄️</option>
-              <option value="Carpentry">Carpentry 🔨</option>
-              <option value="Painting">Painting 🎨</option>
-              <option value="General Contracting">General Contracting 🏗️</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Your Labor Rate ($/hr)</label>
-            <input type="number" id="est-hourly-rate" value="75" min="1" step="0.5" oninput="calculateEstimateTotals()" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm">
-          </div>
-        </div>
-
-        <hr class="border-line my-2">
-
-        <!-- Line Items & Estimation Math -->
-        <h3 class="font-bold text-sm text-ink flex items-center justify-between">
-          <span>Cost Estimates Breakdown</span>
-          <span class="text-xs font-normal text-muted">Auto-calculated live</span>
-        </h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Est. Materials Cost ($)</label>
-            <input type="number" id="est-mat-cost" value="500" min="0" step="10" oninput="calculateEstimateTotals()" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm font-semibold">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Est. Labor (Hours)</label>
-            <input type="number" id="est-labor-hrs" value="12" min="0" step="0.5" oninput="calculateEstimateTotals()" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm font-semibold">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-muted mb-1">Overhead/Markup (%)</label>
-            <input type="number" id="est-markup-pct" value="15" min="0" step="1" oninput="calculateEstimateTotals()" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm font-semibold">
-          </div>
-        </div>
-
-        <!-- Estimate Calculation Summary Box -->
-        <div class="bg-paper p-4 rounded-xl border border-line space-y-2 text-sm">
-          <div class="flex justify-between text-muted">
-            <span>Estimated Materials:</span>
-            <span id="preview-mat">$500.00</span>
-          </div>
-          <div class="flex justify-between text-muted">
-            <span>Estimated Labor (<span id="preview-hrs-count">12</span> hrs @ $<span id="preview-rate-count">75</span>/hr):</span>
-            <span id="preview-labor">$900.00</span>
-          </div>
-          <div class="flex justify-between text-muted">
-            <span>Markup Margin (<span id="preview-markup-pct">15</span>%):</span>
-            <span id="preview-markup">$210.00</span>
-          </div>
-          <div class="border-t border-line pt-2 flex justify-between font-extrabold text-base text-ink">
-            <span>Total Estimated Quote:</span>
-            <span id="preview-total" class="text-accent">$1,610.00</span>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <button type="submit" class="w-full py-3.5 px-4 bg-accent hover:bg-accent-dark text-white font-extrabold rounded-xl text-center shadow-sm transition-all touch-active flex items-center justify-center gap-2">
-          <i class="fa-solid fa-paper-plane"></i> Save & Generate Estimate
-        </button>
       </form>
+      <p class="fine">No card. No spam. One email when it opens — that's it.</p>
     </div>
-  </section>
-
-
-  <!-- TAB 3: QUICK COST LOGGER (MOBILE FIELD ENTRY) -->
-  <section id="view-log" class="tab-content hidden space-y-6">
-    <div class="max-w-lg mx-auto">
-      <div class="mb-4 text-center">
-        <span class="bg-orange-100 text-accent-dark font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">Truck / On-Site Logger</span>
-        <h1 class="text-2xl font-extrabold text-ink tracking-tight">Log Job Expense</h1>
-        <p class="text-muted text-sm">Snap or type costs instantly before you leave the parking lot.</p>
-      </div>
-
-      <form id="cost-log-form" onsubmit="handleLogExpense(event)" class="bg-white p-5 sm:p-6 rounded-2xl border border-line space-y-5 shadow-sm">
-        
-        <!-- Job Picker -->
-        <div>
-          <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Select Job *</label>
-          <select id="log-job-id" required class="w-full px-3.5 py-3 rounded-xl border border-line text-ink font-semibold focus:outline-none focus:border-accent text-base bg-white">
-            <!-- Dynamically populated -->
-          </select>
-        </div>
-
-        <!-- Expense Category Toggle Buttons -->
-        <div>
-          <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-2">Expense Type *</label>
-          <div class="grid grid-cols-3 gap-2" id="category-selector">
-            <button type="button" onclick="selectLogCategory('Material')" id="cat-btn-Material" class="category-btn p-3 rounded-xl border-2 border-accent bg-orange-50 text-accent font-bold text-xs flex flex-col items-center gap-1 transition-all">
-              <i class="fa-solid fa-cart-shopping text-base"></i>
-              <span>Material</span>
-            </button>
-            <button type="button" onclick="selectLogCategory('Labor')" id="cat-btn-Labor" class="category-btn p-3 rounded-xl border border-line text-muted font-bold text-xs flex flex-col items-center gap-1 transition-all hover:bg-paper">
-              <i class="fa-solid fa-clock text-base"></i>
-              <span>Labor Hours</span>
-            </button>
-            <button type="button" onclick="selectLogCategory('Extra')" id="cat-btn-Extra" class="category-btn p-3 rounded-xl border border-line text-muted font-bold text-xs flex flex-col items-center gap-1 transition-all hover:bg-paper">
-              <i class="fa-solid fa-triangle-exclamation text-base"></i>
-              <span>Surprise Fee</span>
-            </button>
-          </div>
-          <input type="hidden" id="log-category" value="Material">
-        </div>
-
-        <!-- Dynamic Input Field (Amount / Hours) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label id="log-amount-label" class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Amount Spent ($) *</label>
-            <div class="relative">
-              <span id="log-amount-prefix" class="absolute left-3.5 top-3 text-muted font-bold">$</span>
-              <input type="number" id="log-amount" required step="0.01" min="0.1" placeholder="0.00" class="w-full pl-8 pr-3 py-3 rounded-xl border border-line text-ink text-lg font-bold focus:outline-none focus:border-accent">
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Date Logged</label>
-            <input type="date" id="log-date" required class="w-full px-3.5 py-3 rounded-xl border border-line text-ink text-sm font-semibold focus:outline-none focus:border-accent">
-          </div>
-        </div>
-
-        <!-- Description & Vendor -->
-        <div>
-          <label class="block text-xs font-bold text-ink uppercase tracking-wider mb-1.5">Note / Vendor / Details</label>
-          <input type="text" id="log-note" required placeholder="e.g. Home Depot plumbing fittings, Dump fee, 4 hrs extra framing" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm">
-        </div>
-
-        <!-- Mock Receipt Scanner -->
-        <div class="p-3 bg-paper rounded-xl border border-dashed border-muted/50 flex items-center justify-between text-xs text-muted">
-          <span class="flex items-center gap-2">
-            <i class="fa-solid fa-camera text-accent text-base"></i>
-            <span>Attach Receipt Photo (Optional)</span>
-          </span>
-          <button type="button" onclick="simulateReceiptUpload()" id="btn-receipt-upload" class="bg-white border border-line px-2.5 py-1 rounded-lg text-ink font-bold hover:bg-slate-50">
-            Upload
-          </button>
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit" class="w-full py-4 px-4 bg-ink hover:bg-black text-white font-extrabold rounded-xl text-center shadow-md transition-all touch-active flex items-center justify-center gap-2">
-          <i class="fa-solid fa-check-circle text-accent"></i> Log Expense to Job
-        </button>
-      </form>
-    </div>
-  </section>
-
-
-  <!-- TAB 4: PROFIT INSIGHTS (WHICH JOBS MAKE MONEY) -->
-  <section id="view-insights" class="tab-content hidden space-y-6">
-    <div>
-      <h1 class="text-2xl font-extrabold text-ink tracking-tight">Trade Profit Insights</h1>
-      <p class="text-muted text-sm">Uncover which job categories actually make money and where labor leaks occur.</p>
-    </div>
-
-    <!-- Smart AI/Data Truth Alert Box -->
-    <div class="bg-ink text-white p-5 rounded-2xl shadow-sm relative overflow-hidden">
-      <div class="flex items-start gap-3.5 z-10 relative">
-        <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-accent flex items-center justify-center font-bold text-xl flex-shrink-0">
-          💡
-        </div>
-        <div>
-          <h3 class="font-extrabold text-base text-white mb-1">Contractor Truth Engine Alert</h3>
-          <p id="insight-smart-tip" class="text-slate-300 text-sm leading-relaxed">
-            Loading trade statistics...
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Trade Performance Cards Breakdown -->
-    <div class="bg-white p-6 rounded-2xl border border-line space-y-4">
-      <h2 class="font-extrabold text-lg text-ink">Profit Margin by Trade Category</h2>
-      
-      <div id="trade-bars-container" class="space-y-4">
-        <!-- Dynamically rendered trade profit bars -->
-      </div>
-    </div>
-
-    <!-- Historical Comparison Overview Table -->
-    <div class="bg-white p-6 rounded-2xl border border-line space-y-4">
-      <h2 class="font-extrabold text-lg text-ink">Completed Jobs Summary</h2>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-line text-xs font-bold text-muted uppercase">
-              <th class="pb-2">Job Name</th>
-              <th class="pb-2">Trade</th>
-              <th class="pb-2 text-right">Est. Rev</th>
-              <th class="pb-2 text-right">Real Cost</th>
-              <th class="pb-2 text-right">Net Profit</th>
-              <th class="pb-2 text-right">Margin</th>
-            </tr>
-          </thead>
-          <tbody id="insights-table-body" class="divide-y divide-line">
-            <!-- Dynamically populated table -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-
-<!-- BOTTOM MOBILE NAVIGATION (Visible only on small screens) -->
-<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-line z-40 px-2 py-2 shadow-lg">
-  <div class="grid grid-cols-4 gap-1 text-center">
-    <button onclick="switchTab('jobs')" id="mob-tab-jobs" class="flex flex-col items-center justify-center py-1.5 text-accent font-bold text-xs">
-      <i class="fa-solid fa-receipt text-lg mb-0.5"></i>
-      <span>Truth</span>
-    </button>
-    <button onclick="switchTab('estimate')" id="mob-tab-estimate" class="flex flex-col items-center justify-center py-1.5 text-muted font-bold text-xs">
-      <i class="fa-solid fa-plus-circle text-lg mb-0.5"></i>
-      <span>Estimate</span>
-    </button>
-    <button onclick="switchTab('log')" id="mob-tab-log" class="flex flex-col items-center justify-center py-1.5 text-muted font-bold text-xs">
-      <i class="fa-solid fa-bolt text-lg mb-0.5"></i>
-      <span>Log Cost</span>
-    </button>
-    <button onclick="switchTab('insights')" id="mob-tab-insights" class="flex flex-col items-center justify-center py-1.5 text-muted font-bold text-xs">
-      <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
-      <span>Insights</span>
-    </button>
+    <p class="trust">Joining from r/Contractor or a trade group? Tell us your trade in the form's hidden field above if you customize it.</p>
   </div>
-</nav>
 
-<!-- TOAST NOTIFICATION CONTAINER -->
-<div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
-
-
-<script>
-/**
- * JobTruth Prototype Application Logic
- */
-
-// Initial Seed Data matching landing page scenarios
-const INITIAL_JOBS = [
-  {
-    id: 'job-1',
-    clientName: 'Sarah Miller',
-    jobName: 'Kitchen Remodel Plumbing & Sink',
-    trade: 'Plumbing',
-    status: 'Completed',
-    createdAt: '2026-09-10',
-    hourlyRate: 60,
-    estMaterials: 1000,
-    estLaborHours: 18,
-    estMarkupPct: 6,
-    estTotal: 1824.00,
-    expenses: [
-      { id: 'exp-1', type: 'Material', amount: 1231.40, note: 'Supply house pipes, valves & fixture set', date: '2026-09-12' },
-      { id: 'exp-2', type: 'Labor', amount: 678.00, hours: 26, note: '26 hrs actual work logged (Est. was 18 hrs)', date: '2026-09-15' },
-      { id: 'exp-3', type: 'Extra', amount: 60.00, note: 'Extra supply run + disposal fee', date: '2026-09-15' }
-    ]
-  },
-  {
-    id: 'job-2',
-    clientName: 'Dave Jenkins',
-    jobName: '200A Electrical Panel Upgrade',
-    trade: 'Electrical',
-    status: 'Completed',
-    createdAt: '2026-09-18',
-    hourlyRate: 85,
-    estMaterials: 800,
-    estLaborHours: 16,
-    estMarkupPct: 15,
-    estTotal: 2484.00,
-    expenses: [
-      { id: 'exp-4', type: 'Material', amount: 760.00, note: 'Eaton 200A Panel, main breakers & wire', date: '2026-09-19' },
-      { id: 'exp-5', type: 'Labor', amount: 1190.00, hours: 14, note: '14 hrs actual work logged (Beat estimate!)', date: '2026-09-20' },
-      { id: 'exp-6', type: 'Extra', amount: 50.00, note: 'City permit inspection fee', date: '2026-09-20' }
-    ]
-  },
-  {
-    id: 'job-3',
-    clientName: 'Mark Stevens',
-    jobName: 'Central AC Heat Pump Replacement',
-    trade: 'HVAC',
-    status: 'Active',
-    createdAt: '2026-09-24',
-    hourlyRate: 90,
-    estMaterials: 2800,
-    estLaborHours: 12,
-    estMarkupPct: 12,
-    estTotal: 4345.60,
-    expenses: [
-      { id: 'exp-7', type: 'Material', amount: 2750.00, note: '3-Ton Condenser & Heat Pump unit', date: '2026-09-25' },
-      { id: 'exp-8', type: 'Labor', amount: 720.00, hours: 8, note: 'Day 1 framing & line set run', date: '2026-09-26' }
-    ]
-  }
-];
-
-// App State
-let jobs = [];
-let currentFilter = 'all';
-
-// On Load Initialization
-window.onload = function() {
-  loadJobsFromStorage();
-  
-  // Set default dates for forms
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('log-date').value = today;
-
-  // Initial Calculation & Render
-  calculateEstimateTotals();
-  renderAll();
-};
-
-function loadJobsFromStorage() {
-  const stored = localStorage.getItem('jobtruth_jobs');
-  if (stored) {
-    try {
-      jobs = JSON.parse(stored);
-    } catch (e) {
-      jobs = [...INITIAL_JOBS];
-    }
-  } else {
-    jobs = [...INITIAL_JOBS];
-    saveJobsToStorage();
-  }
-}
-
-function saveJobsToStorage() {
-  localStorage.setItem('jobtruth_jobs', JSON.stringify(jobs));
-}
-
-function confirmResetData() {
-  if (confirm("Reset prototype back to original sample jobs? Custom added estimates will be replaced.")) {
-    jobs = JSON.parse(JSON.stringify(INITIAL_JOBS));
-    saveJobsToStorage();
-    renderAll();
-    showToast("Demo data restored!");
-  }
-}
-
-function switchTab(tabName) {
-  // Hide all sections
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  
-  // Show target section
-  const target = document.getElementById(`view-${tabName}`);
-  if (target) target.classList.remove('hidden');
-
-  // Update Nav Button styling (Desktop)
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('text-accent', 'bg-orange-50');
-    btn.classList.add('text-muted');
-  });
-  const activeDesktopBtn = document.getElementById(`tab-btn-${tabName}`);
-  if (activeDesktopBtn) {
-    activeDesktopBtn.classList.remove('text-muted');
-    activeDesktopBtn.classList.add('text-accent', 'bg-orange-50');
-  }
-
-  // Update Mobile Nav styling
-  document.querySelectorAll('nav.md\\:hidden button').forEach(btn => {
-    btn.classList.remove('text-accent');
-    btn.classList.add('text-muted');
-  });
-  const activeMobileBtn = document.getElementById(`mob-tab-${tabName}`);
-  if (activeMobileBtn) {
-    activeMobileBtn.classList.remove('text-muted');
-    activeMobileBtn.classList.add('text-accent');
-  }
-
-  // Refresh view contents if switching tabs
-  if (tabName === 'log') {
-    populateJobDropdown();
-  } else if (tabName === 'insights') {
-    renderInsights();
-  }
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-
-function calculateJobActuals(job) {
-  let actualMat = 0;
-  let actualLaborCost = 0;
-  let actualLaborHrs = 0;
-  let actualExtra = 0;
-
-  (job.expenses || []).forEach(exp => {
-    if (exp.type === 'Material') {
-      actualMat += exp.amount;
-    } else if (exp.type === 'Labor') {
-      actualLaborCost += exp.amount;
-      actualLaborHrs += (exp.hours || (exp.amount / (job.hourlyRate || 75)));
-    } else if (exp.type === 'Extra') {
-      actualExtra += exp.amount;
-    }
-  });
-
-  const totalCost = actualMat + actualLaborCost + actualExtra;
-  const netProfit = job.estTotal - totalCost;
-  const marginPct = job.estTotal > 0 ? (netProfit / job.estTotal) * 100 : 0;
-
-  return {
-    actualMat,
-    actualLaborCost,
-    actualLaborHrs,
-    actualExtra,
-    totalCost,
-    netProfit,
-    marginPct
-  };
-}
-
-function formatCurrency(num) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num || 0);
-}
-
-
-function renderAll() {
-  renderJobsList();
-  renderSummaryStats();
-  populateJobDropdown();
-}
-
-function setJobFilter(filter) {
-  currentFilter = filter;
-  ['all', 'active', 'completed'].forEach(f => {
-    const btn = document.getElementById(`filter-${f}`);
-    if (btn) {
-      if (f === filter.toLowerCase()) {
-        btn.classList.add('bg-ink', 'text-white');
-        btn.classList.remove('text-muted');
-      } else {
-        btn.classList.remove('bg-ink', 'text-white');
-        btn.classList.add('text-muted');
-      }
-    }
-  });
-  renderJobsList();
-}
-
-function renderSummaryStats() {
-  let totalEst = 0;
-  let totalCost = 0;
-
-  jobs.forEach(j => {
-    const actuals = calculateJobActuals(j);
-    totalEst += j.estTotal;
-    totalCost += actuals.totalCost;
-  });
-
-  const netProfit = totalEst - totalCost;
-  const avgMargin = totalEst > 0 ? (netProfit / totalEst) * 100 : 0;
-
-  document.getElementById('stat-est-rev').innerText = formatCurrency(totalEst);
-  document.getElementById('stat-actual-cost').innerText = formatCurrency(totalCost);
-  
-  const netEl = document.getElementById('stat-net-profit');
-  netEl.innerText = formatCurrency(netProfit);
-  netEl.className = `text-lg font-extrabold ${netProfit >= 0 ? 'text-good' : 'text-bad'}`;
-
-  document.getElementById('stat-avg-margin').innerText = `${avgMargin.toFixed(1)}%`;
-}
-
-function renderJobsList() {
-  const container = document.getElementById('jobs-container');
-  container.innerHTML = '';
-
-  const filteredJobs = jobs.filter(j => {
-    if (currentFilter === 'Active') return j.status === 'Active';
-    if (currentFilter === 'Completed') return j.status === 'Completed';
-    return true;
-  });
-
-  if (filteredJobs.length === 0) {
-    container.innerHTML = `
-      <div class="bg-white p-8 rounded-2xl border border-line text-center space-y-3">
-        <div class="text-3xl">📋</div>
-        <h3 class="font-bold text-ink">No jobs found</h3>
-        <p class="text-muted text-sm">Create a new estimate or change filters to get started.</p>
+  <!-- HOW IT WORKS -->
+  <section>
+    <h2>Three things. Done right. Nothing else.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Send professional estimates</h3>
+        <p>In minutes — materials, labor, and markup calculated for you. Looks like the big guys, priced for the little guy.</p>
       </div>
-    `;
-    return;
-  }
-
-  filteredJobs.forEach(job => {
-    const actuals = calculateJobActuals(job);
-    const isProfitable = actuals.netProfit >= 0;
-
-    // Check for specific labor overage
-    const laborOverageHrs = actuals.actualLaborHrs - job.estLaborHours;
-    
-    // Verdict Generator
-    let verdictHTML = '';
-    if (job.status === 'Completed' || actuals.totalCost > job.estTotal) {
-      if (!isProfitable) {
-        verdictHTML = `
-          <div class="mt-4 p-3.5 bg-red-50 border-l-4 border-bad rounded-r-xl text-xs sm:text-sm text-ink space-y-1">
-            <div class="font-extrabold text-bad flex items-center gap-1.5">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              <span>Truth Verdict: Lost ${formatCurrency(Math.abs(actuals.netProfit))} on this job.</span>
-            </div>
-            <p class="text-muted">
-              ${laborOverageHrs > 0 ? `Labor ran <strong>+${laborOverageHrs.toFixed(1)} hrs over</strong> estimate.` : ''}
-              ${actuals.actualMat > job.estMaterials ? `Material costs exceeded quote by ${formatCurrency(actuals.actualMat - job.estMaterials)}.` : ''}
-            </p>
-          </div>
-        `;
-      } else {
-        verdictHTML = `
-          <div class="mt-4 p-3.5 bg-emerald-50 border-l-4 border-good rounded-r-xl text-xs sm:text-sm text-ink space-y-1">
-            <div class="font-extrabold text-good flex items-center gap-1.5">
-              <i class="fa-solid fa-circle-check"></i>
-              <span>Truth Verdict: Profitable! Kept ${formatCurrency(actuals.netProfit)} net profit (${actuals.marginPct.toFixed(1)}% margin).</span>
-            </div>
-            <p class="text-muted">
-              ${laborOverageHrs <= 0 ? `Completed ${Math.abs(laborOverageHrs).toFixed(1)} hours faster than estimated!` : 'Slight labor slip, but overall margin held strong.'}
-            </p>
-          </div>
-        `;
-      }
-    }
-
-    const card = document.createElement('div');
-    card.className = "bg-white rounded-2xl border border-line p-5 shadow-sm space-y-4 hover:border-slate-300 transition-all";
-    card.innerHTML = `
-      <!-- Card Header -->
-      <div class="flex flex-wrap items-start justify-between gap-2 border-b border-line pb-3">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-base text-ink">${escapeHTML(job.jobName)}</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${job.status === 'Active' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'}">
-              ${job.status}
-            </span>
-          </div>
-          <div class="text-xs text-muted font-medium mt-0.5">
-            Client: <span class="text-ink font-semibold">${escapeHTML(job.clientName)}</span> · Category: <span class="text-ink font-semibold">${job.trade}</span>
-          </div>
-        </div>
-
-        <!-- Profit / Loss Pill -->
-        <div class="text-right">
-          <div class="text-xs uppercase font-bold text-muted">Net Truth</div>
-          <div class="text-lg font-black ${isProfitable ? 'text-good' : 'text-bad'}">
-            ${isProfitable ? '+' : ''}${formatCurrency(actuals.netProfit)}
-          </div>
-        </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Log costs as the job runs</h3>
+        <p>Snap a photo of the supply-house receipt, track labor hours, note the extra trip you didn't charge for.</p>
       </div>
-
-      <!-- Money Breakdown Comparison -->
-      <div class="grid grid-cols-3 gap-2 bg-paper p-3 rounded-xl border border-line/60 text-center text-xs">
-        <div>
-          <div class="text-muted font-semibold">Estimated Quote</div>
-          <div class="text-sm font-extrabold text-ink mt-0.5">${formatCurrency(job.estTotal)}</div>
-        </div>
-        <div>
-          <div class="text-muted font-semibold">Actual Cost Logged</div>
-          <div class="text-sm font-extrabold text-ink mt-0.5">${formatCurrency(actuals.totalCost)}</div>
-        </div>
-        <div>
-          <div class="text-muted font-semibold">Realized Margin</div>
-          <div class="text-sm font-extrabold ${isProfitable ? 'text-good' : 'text-bad'} mt-0.5">
-            ${actuals.marginPct.toFixed(1)}%
-          </div>
-        </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>See the truth after every job</h3>
+        <p>Not a gut feeling. A number. And over time: which job types actually make you money.</p>
       </div>
+    </div>
 
-      <!-- Costs Breakdown Accordion Details -->
-      <details class="group">
-        <summary class="cursor-pointer text-xs font-bold text-accent hover:text-accent-dark flex items-center justify-between select-none py-1">
-          <span><i class="fa-solid fa-list-check mr-1"></i> View Itemized Receipts & Labor (${(job.expenses || []).length} items)</span>
-          <i class="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i>
-        </summary>
-        
-        <div class="mt-3 pt-3 border-t border-line/60 text-xs space-y-2">
-          <!-- Estimate baseline line items -->
-          <div class="p-2 bg-slate-50 rounded-lg text-muted space-y-1">
-            <div class="font-bold text-ink">Estimate Baseline:</div>
-            <div class="flex justify-between"><span>Materials Estimated:</span><span>${formatCurrency(job.estMaterials)}</span></div>
-            <div class="flex justify-between"><span>Labor Estimated:</span><span>${job.estLaborHours} hrs @ $${job.hourlyRate}/hr (${formatCurrency(job.estLaborHours * job.hourlyRate)})</span></div>
-          </div>
+    <div class="demo">
+      <h3>What you'll see when the job closes:</h3>
+      <div class="row"><span>Kitchen remodel — estimated</span><span>$1,824.00</span></div>
+      <div class="row"><span>Materials (actual receipts)</span><span>$1,231.40</span></div>
+      <div class="row"><span>Labor — 26 hrs actual vs 18 est.</span><span>$678.00</span></div>
+      <div class="row"><span>Extra supply run + disposal fee</span><span>$60.00</span></div>
+      <div class="row"><span>Actual job cost</span><span class="neg">$1,969.40</span></div>
+      <div class="verdict">You lost $145.40 on this job. Want to know <em>why</em>? It was the labor hours — and it's the third job this month where that happened.</div>
+    </div>
+  </section>
 
-          <!-- Logged Expenses List -->
-          <div class="font-bold text-ink pt-1">Logged Expenses So Far:</div>
-          <div class="space-y-1.5">
-            ${(job.expenses && job.expenses.length > 0) ? job.expenses.map(exp => `
-              <div class="flex items-center justify-between p-2 bg-paper rounded-lg">
-                <div>
-                  <span class="font-bold ${exp.type === 'Material' ? 'text-blue-700' : exp.type === 'Labor' ? 'text-purple-700' : 'text-amber-700'}">
-                    [${exp.type}]
-                  </span>
-                  <span class="text-ink font-medium ml-1">${escapeHTML(exp.note)}</span>
-                  <span class="text-muted text-[10px] block">${exp.date}</span>
-                </div>
-                <div class="font-extrabold text-ink">${formatCurrency(exp.amount)}</div>
-              </div>
-            `).join('') : '<div class="text-muted italic py-1">No expenses logged yet.</div>'}
-          </div>
+  <!-- WHAT IT'S NOT -->
+  <section>
+    <h2>What it deliberately is NOT</h2>
+    <ul class="notlist">
+      <li>No scheduling or dispatching</li>
+      <li>No CRM, no marketing automation, no GPS tracking</li>
+      <li>No 50 features you'll never touch</li>
+      <li>No "call us for pricing" — it's $19, that's the price</li>
+    </ul>
+    <ul class="poslist">
+      <li>Built for the guy with a van and a toolbox — not a 20-truck fleet</li>
+      <li>Estimates <em>plus</em> profit tracking, at a price the $150/mo platforms can't touch</li>
+      <li>Works on your phone, in the truck, between jobs</li>
+    </ul>
+  </section>
+
+  <!-- PRICE -->
+  <section>
+    <div class="price-card">
+      <div class="amount">$19</div>
+      <div class="per">per month · cancel anytime · first month free for early users</div>
+      <p>Cheaper than the spreadsheet mistakes it's going to catch.</p>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section>
+    <div class="signup">
+      <p>First 50 contractors get early access and a locked-in price.</p>
+      <form action="https://formspree.io/f/xdekbdve" method="POST">
+        <div class="form-row">
+          <input type="email" name="email" placeholder="Your email address" required>
+          <button type="submit">Get early access</button>
         </div>
-      </details>
+      </form>
+      <p class="fine">Still being built. Your email tells us to hurry up on your trade.</p>
+    </div>
+  </section>
 
-      <!-- Dynamic Verdict Banner -->
-      ${verdictHTML}
+</div>
 
-      <!-- Quick Action Buttons -->
-      <div class="pt-2 flex items-center justify-end gap-2 text-xs">
-        <button onclick="quickLogToJob('${job.id}')" class="px-3 py-2 bg-orange-100 hover:bg-orange-200 text-accent-dark font-extrabold rounded-lg transition-all flex items-center gap-1">
-          <i class="fa-solid fa-plus text-xs"></i> Log Cost
-        </button>
-        ${job.status === 'Active' ? `
-          <button onclick="toggleJobStatus('${job.id}')" class="px-3 py-2 bg-ink hover:bg-black text-white font-bold rounded-lg transition-all">
-            Mark Completed
-          </button>
-        ` : `
-          <button onclick="toggleJobStatus('${job.id}')" class="px-3 py-2 border border-line text-muted hover:text-ink font-bold rounded-lg transition-all">
-            Reopen Job
-          </button>
-        `}
-      </div>
-    `;
+<footer>
+  <div class="wrap">
+    <p><strong>JobTruth.</strong> Estimates in, truth out.</p>
+    <p style="margin-top:6px">Questions? Email hello@jobtruth.example — a real person answers.</p>
+  </div>
+</footer>
 
-    container.appendChild(card);
-  });
-}
-
-
-function calculateEstimateTotals() {
-  const mat = parseFloat(document.getElementById('est-mat-cost').value) || 0;
-  const hrs = parseFloat(document.getElementById('est-labor-hrs').value) || 0;
-  const rate = parseFloat(document.getElementById('est-hourly-rate').value) || 0;
-  const markupPct = parseFloat(document.getElementById('est-markup-pct').value) || 0;
-
-  const laborSub = hrs * rate;
-  const subtotal = mat + laborSub;
-  const markupVal = subtotal * (markupPct / 100);
-  const grandTotal = subtotal + markupVal;
-
-  document.getElementById('preview-mat').innerText = formatCurrency(mat);
-  document.getElementById('preview-hrs-count').innerText = hrs;
-  document.getElementById('preview-rate-count').innerText = rate;
-  document.getElementById('preview-labor').innerText = formatCurrency(laborSub);
-  document.getElementById('preview-markup-pct').innerText = markupPct;
-  document.getElementById('preview-markup').innerText = formatCurrency(markupVal);
-  document.getElementById('preview-total').innerText = formatCurrency(grandTotal);
-
-  return { mat, hrs, rate, markupPct, grandTotal };
-}
-
-function handleCreateEstimate(event) {
-  event.preventDefault();
-
-  const clientName = document.getElementById('est-client').value.trim();
-  const jobName = document.getElementById('est-title').value.trim();
-  const trade = document.getElementById('est-trade').value;
-  const math = calculateEstimateTotals();
-
-  const newJob = {
-    id: 'job-' + Date.now(),
-    clientName: clientName,
-    jobName: jobName,
-    trade: trade,
-    status: 'Active',
-    createdAt: new Date().toISOString().split('T')[0],
-    hourlyRate: math.rate,
-    estMaterials: math.mat,
-    estLaborHours: math.hrs,
-    estMarkupPct: math.markupPct,
-    estTotal: math.grandTotal,
-    expenses: []
-  };
-
-  jobs.unshift(newJob);
-  saveJobsToStorage();
-
-  // Reset Form
-  document.getElementById('estimate-form').reset();
-  calculateEstimateTotals();
-
-  showToast('New Job Estimate Created!');
-  renderAll();
-  switchTab('jobs');
-}
-
-
-function selectLogCategory(category) {
-  document.getElementById('log-category').value = category;
-
-  const categories = ['Material', 'Labor', 'Extra'];
-  categories.forEach(cat => {
-    const btn = document.getElementById(`cat-btn-${cat}`);
-    if (cat === category) {
-      btn.className = "category-btn p-3 rounded-xl border-2 border-accent bg-orange-50 text-accent font-bold text-xs flex flex-col items-center gap-1 transition-all";
-    } else {
-      btn.className = "category-btn p-3 rounded-xl border border-line text-muted font-bold text-xs flex flex-col items-center gap-1 transition-all hover:bg-paper";
-    }
-  });
-
-  const label = document.getElementById('log-amount-label');
-  const prefix = document.getElementById('log-amount-prefix');
-  const input = document.getElementById('log-amount');
-
-  if (category === 'Labor') {
-    label.innerText = 'Hours Worked *';
-    prefix.innerText = '⏱️';
-    input.placeholder = 'e.g. 4.5';
-  } else if (category === 'Material') {
-    label.innerText = 'Amount Spent ($) *';
-    prefix.innerText = '$';
-    input.placeholder = '0.00';
-  } else {
-    label.innerText = 'Extra Fee / Cost ($) *';
-    prefix.innerText = '$';
-    input.placeholder = '0.00';
-  }
-}
-
-function populateJobDropdown() {
-  const select = document.getElementById('log-job-id');
-  select.innerHTML = '';
-
-  const activeJobs = jobs.filter(j => j.status === 'Active');
-  const targetList = activeJobs.length > 0 ? activeJobs : jobs;
-
-  if (targetList.length === 0) {
-    select.innerHTML = '<option value="">No jobs available. Create one first!</option>';
-    return;
-  }
-
-  targetList.forEach(j => {
-    const opt = document.createElement('option');
-    opt.value = j.id;
-    opt.innerText = `${j.jobName} (${j.clientName})`;
-    select.appendChild(opt);
-  });
-}
-
-function quickLogToJob(jobId) {
-  switchTab('log');
-  setTimeout(() => {
-    const select = document.getElementById('log-job-id');
-    if (select) select.value = jobId;
-  }, 50);
-}
-
-function handleLogExpense(event) {
-  event.preventDefault();
-
-  const jobId = document.getElementById('log-job-id').value;
-  const category = document.getElementById('log-category').value;
-  const valInput = parseFloat(document.getElementById('log-amount').value) || 0;
-  const dateStr = document.getElementById('log-date').value;
-  const note = document.getElementById('log-note').value.trim();
-
-  const targetJob = jobs.find(j => j.id === jobId);
-  if (!targetJob) {
-    showToast('Please select a valid job.');
-    return;
-  }
-
-  let finalAmount = valInput;
-  let loggedHours = null;
-
-  if (category === 'Labor') {
-    loggedHours = valInput;
-    finalAmount = valInput * (targetJob.hourlyRate || 75);
-  }
-
-  const newExpense = {
-    id: 'exp-' + Date.now(),
-    type: category,
-    amount: finalAmount,
-    hours: loggedHours,
-    note: note,
-    date: dateStr
-  };
-
-  if (!targetJob.expenses) targetJob.expenses = [];
-  targetJob.expenses.push(newExpense);
-
-  saveJobsToStorage();
-
-  // Reset form note & amount
-  document.getElementById('log-amount').value = '';
-  document.getElementById('log-note').value = '';
-
-  showToast(`Logged ${category === 'Labor' ? loggedHours + ' labor hrs' : formatCurrency(finalAmount)} to ${targetJob.jobName}!`);
-  renderAll();
-  switchTab('jobs');
-}
-
-function toggleJobStatus(jobId) {
-  const targetJob = jobs.find(j => j.id === jobId);
-  if (targetJob) {
-    targetJob.status = targetJob.status === 'Active' ? 'Completed' : 'Active';
-    saveJobsToStorage();
-    showToast(`Job marked as ${targetJob.status}`);
-    renderAll();
-  }
-}
-
-function simulateReceiptUpload() {
-  const btn = document.getElementById('btn-receipt-upload');
-  btn.innerHTML = '<i class="fa-solid fa-check text-good"></i> Receipt Attached';
-  btn.classList.add('bg-emerald-50', 'text-good', 'border-good');
-  showToast('Receipt image simulated & attached!');
-}
-
-
-function renderInsights() {
-  const tradeMap = {};
-
-  jobs.forEach(j => {
-    const actuals = calculateJobActuals(j);
-    if (!tradeMap[j.trade]) {
-      tradeMap[j.trade] = { count: 0, est: 0, cost: 0, profit: 0 };
-    }
-    tradeMap[j.trade].count += 1;
-    tradeMap[j.trade].est += j.estTotal;
-    tradeMap[j.trade].cost += actuals.totalCost;
-    tradeMap[j.trade].profit += actuals.netProfit;
-  });
-
-  const barsContainer = document.getElementById('trade-bars-container');
-  barsContainer.innerHTML = '';
-
-  let highestMarginTrade = '';
-  let highestMarginVal = -999;
-  let lowestMarginTrade = '';
-  let lowestMarginVal = 999;
-
-  Object.keys(tradeMap).forEach(trade => {
-    const data = tradeMap[trade];
-    const margin = data.est > 0 ? (data.profit / data.est) * 100 : 0;
-
-    if (margin > highestMarginVal) {
-      highestMarginVal = margin;
-      highestMarginTrade = trade;
-    }
-    if (margin < lowestMarginVal) {
-      lowestMarginVal = margin;
-      lowestMarginTrade = trade;
-    }
-
-    const isPos = margin >= 0;
-    const barWidth = Math.min(Math.max(Math.abs(margin), 10), 100);
-
-    const barEl = document.createElement('div');
-    barEl.className = "space-y-1.5";
-    barEl.innerHTML = `
-      <div class="flex justify-between text-xs font-bold">
-        <span class="text-ink">${trade} (${data.count} jobs)</span>
-        <span class="${isPos ? 'text-good' : 'text-bad'}">${margin.toFixed(1)}% margin (${formatCurrency(data.profit)})</span>
-      </div>
-      <div class="w-full bg-paper rounded-full h-3 overflow-hidden border border-line">
-        <div class="${isPos ? 'bg-good' : 'bg-bad'} h-full rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
-      </div>
-    `;
-    barsContainer.appendChild(barEl);
-  });
-
-  // Dynamic Insight Box Recommendation
-  const tipEl = document.getElementById('insight-smart-tip');
-  if (highestMarginTrade) {
-    tipEl.innerHTML = `
-      Your highest margin jobs are <strong>${highestMarginTrade} (${highestMarginVal.toFixed(1)}% avg profit)</strong>.
-      ${lowestMarginTrade && lowestMarginTrade !== highestMarginTrade && lowestMarginVal < 10 ? 
-        `<br><span class="text-orange-300">Caution:</span> <strong>${lowestMarginTrade}</strong> jobs average low profit margins (${lowestMarginVal.toFixed(1)}%). Consider raising labor estimates by 15% on future ${lowestMarginTrade} bids.` : ''}
-    `;
-  } else {
-    tipEl.innerText = 'Log more completed jobs to generate trade profit insight trends.';
-  }
-
-  // Populate Table
-  const tbody = document.getElementById('insights-table-body');
-  tbody.innerHTML = '';
-
-  jobs.forEach(j => {
-    const actuals = calculateJobActuals(j);
-    const tr = document.createElement('tr');
-    tr.className = "hover:bg-slate-50";
-    tr.innerHTML = `
-      <td class="py-2.5 font-bold text-ink">${escapeHTML(j.jobName)}</td>
-      <td class="py-2.5 text-muted">${j.trade}</td>
-      <td class="py-2.5 text-right font-medium">${formatCurrency(j.estTotal)}</td>
-      <td class="py-2.5 text-right font-medium">${formatCurrency(actuals.totalCost)}</td>
-      <td class="py-2.5 text-right font-extrabold ${actuals.netProfit >= 0 ? 'text-good' : 'text-bad'}">${formatCurrency(actuals.netProfit)}</td>
-      <td class="py-2.5 text-right font-bold ${actuals.netProfit >= 0 ? 'text-good' : 'text-bad'}">${actuals.marginPct.toFixed(1)}%</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-
-function showToast(msg) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = "bg-ink text-white px-4 py-3 rounded-xl shadow-lg border border-slate-700 font-bold text-xs flex items-center gap-2 animate-slide-up pointer-events-auto";
-  toast.innerHTML = `<i class="fa-solid fa-circle-info text-accent"></i> <span>${escapeHTML(msg)}</span>`;
-  
-  container.appendChild(toast);
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-function escapeHTML(str) {
-  if (!str) return '';
-  return str.replace(/[&<>'"]/g, 
-    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-  );
-}
-</script>
 </body>
 </html>
