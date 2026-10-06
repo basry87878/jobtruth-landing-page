@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JobTruth — Know if that job actually made you money</title>
-<meta name="description" content="Estimates are easy. Knowing whether you profited is not. Track real job costs and see your true profit per job. Built for the guy with a van and a toolbox. $19/mo.">
+<meta name="description" content="Estimates are easy. Knowing whether you profited is not. Track real job costs and see your true profit per job. Built for the guy with a van and a toolbox. $9/mo.">
 <style>
   :root {
     --ink: #1a1f24;
@@ -74,7 +74,17 @@
     border-radius: 10px;
     font-size: 1rem;
   }
-  .form-row input:focus { outline: none; border-color: var(--accent); }
+  .form-row select {
+    flex: 1;
+    min-width: 170px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #fff;
+    color: var(--ink);
+  }
+  .form-row input:focus, .form-row select:focus { outline: none; border-color: var(--accent); }
   .form-row button {
     background: var(--accent);
     color: #fff;
@@ -88,7 +98,7 @@
   }
   .form-row button:hover { background: var(--accent-dark); }
   .fine { font-size: 0.82rem; color: var(--muted); margin-top: 10px; }
-  .trust { font-size: 0.85rem; color: var(--muted); margin-bottom: 48px; }
+  .hero .signup { margin-bottom: 28px; }
 
   /* How it works */
   section { padding: 40px 0; }
@@ -211,13 +221,21 @@
       <form action="https://formspree.io/f/xdekbdve" method="POST">
         <div class="form-row">
           <input type="email" name="email" placeholder="Your email address" required>
-          <input type="hidden" name="trade" value="early-access">
+          <select name="trade" required aria-label="Your trade">
+            <option value="" disabled selected>Your trade</option>
+            <option>Plumbing</option>
+            <option>Electrical</option>
+            <option>HVAC</option>
+            <option>Carpentry</option>
+            <option>Painting</option>
+            <option>General contracting</option>
+            <option>Other</option>
+          </select>
           <button type="submit">Join the list</button>
         </div>
       </form>
       <p class="fine">No card. No spam. One email when it opens — that's it.</p>
     </div>
-    <p class="trust">Joining from r/Contractor or a trade group? Tell us your trade in the form's hidden field above if you customize it.</p>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -242,13 +260,14 @@
     </div>
 
     <div class="demo">
-      <h3>What you'll see when the job closes:</h3>
-      <div class="row"><span>Kitchen remodel — estimated</span><span>$1,824.00</span></div>
-      <div class="row"><span>Materials (actual receipts)</span><span>$1,231.40</span></div>
-      <div class="row"><span>Labor — 26 hrs actual vs 18 est.</span><span>$678.00</span></div>
+      <h3>Example: what you'll see when a job closes</h3>
+      <div class="row"><span>Kitchen remodel — quoted</span><span>$1,824.00</span></div>
+      <div class="row"><span>Materials (actual receipts)</span><span>$712.40</span></div>
+      <div class="row"><span>Labor — 26 hrs actual vs 18 est. @ $45/hr</span><span>$1,170.00</span></div>
       <div class="row"><span>Extra supply run + disposal fee</span><span>$60.00</span></div>
-      <div class="row"><span>Actual job cost</span><span class="neg">$1,969.40</span></div>
-      <div class="verdict">You lost $145.40 on this job. Want to know <em>why</em>? It was the labor hours — and it's the third job this month where that happened.</div>
+      <div class="row"><span>Actual job cost</span><span class="neg">$1,942.40</span></div>
+      <div class="row"><span>What you really earned per hour</span><span class="neg">$40.45/hr</span></div>
+      <div class="verdict">You lost $118.40 on this job. Want to know <em>why</em>? It was the labor hours: 26 instead of 18. And it's the third job this month where that happened.</div>
     </div>
   </section>
 
@@ -259,7 +278,7 @@
       <li>No scheduling or dispatching</li>
       <li>No CRM, no marketing automation, no GPS tracking</li>
       <li>No 50 features you'll never touch</li>
-      <li>No "call us for pricing" — it's $19, that's the price</li>
+      <li>No "call us for pricing" — it's $9, that's the price</li>
     </ul>
     <ul class="poslist">
       <li>Built for the guy with a van and a toolbox — not a 20-truck fleet</li>
@@ -271,7 +290,7 @@
   <!-- PRICE -->
   <section>
     <div class="price-card">
-      <div class="amount">$19</div>
+      <div class="amount">$9</div>
       <div class="per">per month · cancel anytime · first month free for early users</div>
       <p>Cheaper than the spreadsheet mistakes it's going to catch.</p>
     </div>
@@ -284,10 +303,20 @@
       <form action="https://formspree.io/f/xdekbdve" method="POST">
         <div class="form-row">
           <input type="email" name="email" placeholder="Your email address" required>
+          <select name="trade" required aria-label="Your trade">
+            <option value="" disabled selected>Your trade</option>
+            <option>Plumbing</option>
+            <option>Electrical</option>
+            <option>HVAC</option>
+            <option>Carpentry</option>
+            <option>Painting</option>
+            <option>General contracting</option>
+            <option>Other</option>
+          </select>
           <button type="submit">Get early access</button>
         </div>
       </form>
-      <p class="fine">Still being built. Your email tells us to hurry up on your trade.</p>
+      <p class="fine">Still being built. Tell us your trade and we'll build for it first.</p>
     </div>
   </section>
 
@@ -296,7 +325,6 @@
 <footer>
   <div class="wrap">
     <p><strong>JobTruth.</strong> Estimates in, truth out.</p>
-    <p style="margin-top:6px">Questions? Email hello@jobtruth.example — a real person answers.</p>
   </div>
 </footer>
 

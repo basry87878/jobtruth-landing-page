@@ -9,6 +9,9 @@
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <!-- Font Awesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -66,6 +69,10 @@
     transform: scale(0.98);
   }
 
+  /* Logged-out state: hide the app, show login */
+  body.logged-out > header, body.logged-out > main, body.logged-out > nav { display: none !important; }
+  body:not(.logged-out) #auth-screen { display: none; }
+
   /* Toast notification animation */
   @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
@@ -76,7 +83,36 @@
   }
 </style>
 </head>
-<body class="min-h-screen flex flex-col pb-24 md:pb-8">
+<body class="logged-out min-h-screen flex flex-col pb-24 md:pb-8">
+
+<!-- LOGIN SCREEN -->
+<div id="auth-screen" class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm bg-white p-6 rounded-2xl border border-line shadow-sm space-y-4">
+    <div class="font-extrabold text-2xl tracking-tight">JobTruth<span class="text-accent">.</span></div>
+    <p class="text-muted text-sm">Enter your email and we'll send a link that signs you in. No password needed.</p>
+    <form id="auth-form" onsubmit="handleSignIn(event)" class="space-y-3">
+      <input type="email" id="auth-email" required autocomplete="email" placeholder="you@example.com" class="w-full px-3.5 py-3 rounded-xl border border-line text-base focus:outline-none focus:border-accent">
+      <button type="submit" id="auth-btn" class="w-full py-3.5 bg-accent hover:bg-accent-dark text-white font-extrabold rounded-xl">Email me a sign-in link</button>
+    </form>
+    <p id="auth-msg" class="text-sm text-muted min-h-[1.25rem]"></p>
+  </div>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<div id="onboard-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
+  <form onsubmit="handleOnboarding(event)" class="w-full max-w-sm bg-white p-6 rounded-2xl space-y-4">
+    <h2 class="font-extrabold text-lg">Set up your business</h2>
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Business name *</label>
+      <input type="text" id="onb-name" required maxlength="100" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-sm focus:outline-none focus:border-accent">
+    </div>
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Your usual hourly rate ($/hr)</label>
+      <input type="number" id="onb-rate" value="75" min="1" step="0.5" required class="w-full px-3.5 py-2.5 rounded-xl border border-line text-sm focus:outline-none focus:border-accent">
+    </div>
+    <button type="submit" class="w-full py-3 bg-accent hover:bg-accent-dark text-white font-extrabold rounded-xl">Save and continue</button>
+  </form>
+</div>
 
 <!-- HEADER / NAVBAR -->
 <header class="bg-[#ffffff] border-b border-line sticky top-0 z-30 shadow-sm">
@@ -104,9 +140,9 @@
       </button>
     </nav>
 
-    <!-- Quick Reset Button -->
-    <button onclick="confirmResetData()" title="Reset to Sample Data" class="text-muted hover:text-bad text-xs font-semibold flex items-center gap-1 bg-paper px-2.5 py-1.5 rounded-md border border-line">
-      <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">Reset Demo</span>
+    <!-- Sign out -->
+    <button onclick="signOut()" title="Sign out" class="text-muted hover:text-ink text-xs font-semibold flex items-center gap-1 bg-paper px-2.5 py-1.5 rounded-md border border-line">
+      <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Sign out</span>
     </button>
   </div>
 </header>
@@ -309,17 +345,6 @@
           <input type="text" id="log-note" required placeholder="e.g. Home Depot plumbing fittings, Dump fee, 4 hrs extra framing" class="w-full px-3.5 py-2.5 rounded-xl border border-line text-ink focus:outline-none focus:border-accent text-sm">
         </div>
 
-        <!-- Mock Receipt Scanner -->
-        <div class="p-3 bg-paper rounded-xl border border-dashed border-muted/50 flex items-center justify-between text-xs text-muted">
-          <span class="flex items-center gap-2">
-            <i class="fa-solid fa-camera text-accent text-base"></i>
-            <span>Attach Receipt Photo (Optional)</span>
-          </span>
-          <button type="button" onclick="simulateReceiptUpload()" id="btn-receipt-upload" class="bg-white border border-line px-2.5 py-1 rounded-lg text-ink font-bold hover:bg-slate-50">
-            Upload
-          </button>
-        </div>
-
         <!-- Submit Button -->
         <button type="submit" class="w-full py-4 px-4 bg-ink hover:bg-black text-white font-extrabold rounded-xl text-center shadow-md transition-all touch-active flex items-center justify-center gap-2">
           <i class="fa-solid fa-check-circle text-accent"></i> Log Expense to Job
@@ -418,105 +443,115 @@
  * JobTruth Prototype Application Logic
  */
 
-// Initial Seed Data matching landing page scenarios
-const INITIAL_JOBS = [
-  {
-    id: 'job-1',
-    clientName: 'Sarah Miller',
-    jobName: 'Kitchen Remodel Plumbing & Sink',
-    trade: 'Plumbing',
-    status: 'Completed',
-    createdAt: '2026-09-10',
-    hourlyRate: 60,
-    estMaterials: 1000,
-    estLaborHours: 18,
-    estMarkupPct: 6,
-    estTotal: 1824.00,
-    expenses: [
-      { id: 'exp-1', type: 'Material', amount: 1231.40, note: 'Supply house pipes, valves & fixture set', date: '2026-09-12' },
-      { id: 'exp-2', type: 'Labor', amount: 678.00, hours: 26, note: '26 hrs actual work logged (Est. was 18 hrs)', date: '2026-09-15' },
-      { id: 'exp-3', type: 'Extra', amount: 60.00, note: 'Extra supply run + disposal fee', date: '2026-09-15' }
-    ]
-  },
-  {
-    id: 'job-2',
-    clientName: 'Dave Jenkins',
-    jobName: '200A Electrical Panel Upgrade',
-    trade: 'Electrical',
-    status: 'Completed',
-    createdAt: '2026-09-18',
-    hourlyRate: 85,
-    estMaterials: 800,
-    estLaborHours: 16,
-    estMarkupPct: 15,
-    estTotal: 2484.00,
-    expenses: [
-      { id: 'exp-4', type: 'Material', amount: 760.00, note: 'Eaton 200A Panel, main breakers & wire', date: '2026-09-19' },
-      { id: 'exp-5', type: 'Labor', amount: 1190.00, hours: 14, note: '14 hrs actual work logged (Beat estimate!)', date: '2026-09-20' },
-      { id: 'exp-6', type: 'Extra', amount: 50.00, note: 'City permit inspection fee', date: '2026-09-20' }
-    ]
-  },
-  {
-    id: 'job-3',
-    clientName: 'Mark Stevens',
-    jobName: 'Central AC Heat Pump Replacement',
-    trade: 'HVAC',
-    status: 'Active',
-    createdAt: '2026-09-24',
-    hourlyRate: 90,
-    estMaterials: 2800,
-    estLaborHours: 12,
-    estMarkupPct: 12,
-    estTotal: 4345.60,
-    expenses: [
-      { id: 'exp-7', type: 'Material', amount: 2750.00, note: '3-Ton Condenser & Heat Pump unit', date: '2026-09-25' },
-      { id: 'exp-8', type: 'Labor', amount: 720.00, hours: 8, note: 'Day 1 framing & line set run', date: '2026-09-26' }
-    ]
-  }
-];
-
 // App State
 let jobs = [];
 let currentFilter = 'all';
 
 // On Load Initialization
-window.onload = function() {
-  loadJobsFromStorage();
-  
-  // Set default dates for forms
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('log-date').value = today;
+const SUPABASE_URL = 'https://pqfpobppisjeeacaikso.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Nf3xAR0lEoiK5_l9-pqEpg_yzUZBg3I'; // public key; data is protected by row-level security
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Initial Calculation & Render
+let currentUserId = null;
+let defaultRate = 75;
+
+const TYPE_OUT = { material: 'Material', labor: 'Labor', extra: 'Extra' };
+const TYPE_IN = { Material: 'material', Labor: 'labor', Extra: 'extra' };
+const fromCents = c => (c || 0) / 100;
+const toCents = d => Math.round((parseFloat(d) || 0) * 100);
+
+window.onload = async function() {
+  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
   calculateEstimateTotals();
-  renderAll();
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session && session.user.id !== currentUserId) {
+      setTimeout(() => enterApp(session.user), 0);
+    } else if (!session && currentUserId) {
+      currentUserId = null;
+      jobs = [];
+      document.body.classList.add('logged-out');
+    }
+  });
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session && session.user.id !== currentUserId) enterApp(session.user);
 };
 
-function loadJobsFromStorage() {
-  const stored = localStorage.getItem('jobtruth_jobs');
-  if (stored) {
-    try {
-      jobs = JSON.parse(stored);
-    } catch (e) {
-      jobs = [...INITIAL_JOBS];
-    }
-  } else {
-    jobs = [...INITIAL_JOBS];
-    saveJobsToStorage();
-  }
+async function handleSignIn(event) {
+  event.preventDefault();
+  const btn = document.getElementById('auth-btn');
+  const msg = document.getElementById('auth-msg');
+  btn.disabled = true;
+  msg.textContent = 'Sending...';
+  const { error } = await sb.auth.signInWithOtp({
+    email: document.getElementById('auth-email').value.trim(),
+    options: { emailRedirectTo: window.location.origin + window.location.pathname }
+  });
+  btn.disabled = false;
+  msg.textContent = error
+    ? 'Could not send the link: ' + error.message
+    : 'Check your email and tap the link. You can close this tab.';
 }
 
-function saveJobsToStorage() {
-  localStorage.setItem('jobtruth_jobs', JSON.stringify(jobs));
+async function signOut() {
+  await sb.auth.signOut();
 }
 
-function confirmResetData() {
-  if (confirm("Reset prototype back to original sample jobs? Custom added estimates will be replaced.")) {
-    jobs = JSON.parse(JSON.stringify(INITIAL_JOBS));
-    saveJobsToStorage();
-    renderAll();
-    showToast("Demo data restored!");
+async function enterApp(user) {
+  currentUserId = user.id;
+  document.body.classList.remove('logged-out');
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  if (profile) {
+    defaultRate = fromCents(profile.default_hourly_rate_cents) || 75;
+    document.getElementById('est-hourly-rate').value = defaultRate;
+    calculateEstimateTotals();
   }
+  if (!profile || !profile.business_name) {
+    document.getElementById('onb-rate').value = defaultRate;
+    document.getElementById('onboard-modal').classList.remove('hidden');
+  }
+  switchTab('jobs');
+  await loadJobs();
+}
+
+async function handleOnboarding(event) {
+  event.preventDefault();
+  const rate = parseFloat(document.getElementById('onb-rate').value) || 75;
+  const { error } = await sb.from('profiles').update({
+    business_name: document.getElementById('onb-name').value.trim(),
+    default_hourly_rate_cents: toCents(rate)
+  }).eq('id', currentUserId);
+  if (error) { showToast('Could not save: ' + error.message); return; }
+  defaultRate = rate;
+  document.getElementById('est-hourly-rate').value = rate;
+  calculateEstimateTotals();
+  document.getElementById('onboard-modal').classList.add('hidden');
+}
+
+function mapJob(r) {
+  const expenses = (r.expenses || [])
+    .sort((a, b) => (a.expense_date + a.created_at).localeCompare(b.expense_date + b.created_at))
+    .map(e => ({
+      id: e.id, type: TYPE_OUT[e.type], amount: fromCents(e.amount_cents),
+      hours: e.hours === null ? null : Number(e.hours), note: e.note, date: e.expense_date
+    }));
+  return {
+    id: r.id, clientName: r.client_name, jobName: r.job_name, trade: r.trade,
+    status: r.status === 'completed' ? 'Completed' : 'Active',
+    createdAt: r.created_at.split('T')[0],
+    hourlyRate: fromCents(r.hourly_rate_cents), estMaterials: fromCents(r.est_materials_cents),
+    estLaborHours: Number(r.est_labor_hours), estMarkupPct: Number(r.est_markup_pct),
+    estTotal: fromCents(r.est_total_cents), expenses
+  };
+}
+
+async function loadJobs() {
+  const { data, error } = await sb.from('jobs').select('*, expenses(*)').order('created_at', { ascending: false });
+  if (error) { showToast('Could not load jobs: ' + error.message); return; }
+  jobs = data.map(mapJob);
+  renderAll();
 }
 
 function switchTab(tabName) {
@@ -827,38 +862,30 @@ function calculateEstimateTotals() {
   return { mat, hrs, rate, markupPct, grandTotal };
 }
 
-function handleCreateEstimate(event) {
+async function handleCreateEstimate(event) {
   event.preventDefault();
+  const btn = event.submitter;
+  if (btn) btn.disabled = true;
 
-  const clientName = document.getElementById('est-client').value.trim();
-  const jobName = document.getElementById('est-title').value.trim();
-  const trade = document.getElementById('est-trade').value;
   const math = calculateEstimateTotals();
+  const { error } = await sb.from('jobs').insert({
+    client_name: document.getElementById('est-client').value.trim(),
+    job_name: document.getElementById('est-title').value.trim(),
+    trade: document.getElementById('est-trade').value,
+    hourly_rate_cents: toCents(math.rate),
+    est_materials_cents: toCents(math.mat),
+    est_labor_hours: math.hrs,
+    est_markup_pct: math.markupPct,
+    est_total_cents: toCents(math.grandTotal)
+  });
+  if (btn) btn.disabled = false;
+  if (error) { showToast('Could not save estimate: ' + error.message); return; }
 
-  const newJob = {
-    id: 'job-' + Date.now(),
-    clientName: clientName,
-    jobName: jobName,
-    trade: trade,
-    status: 'Active',
-    createdAt: new Date().toISOString().split('T')[0],
-    hourlyRate: math.rate,
-    estMaterials: math.mat,
-    estLaborHours: math.hrs,
-    estMarkupPct: math.markupPct,
-    estTotal: math.grandTotal,
-    expenses: []
-  };
-
-  jobs.unshift(newJob);
-  saveJobsToStorage();
-
-  // Reset Form
   document.getElementById('estimate-form').reset();
+  document.getElementById('est-hourly-rate').value = defaultRate;
   calculateEstimateTotals();
-
-  showToast('New Job Estimate Created!');
-  renderAll();
+  await loadJobs();
+  showToast('New job estimate saved!');
   switchTab('jobs');
 }
 
@@ -923,67 +950,48 @@ function quickLogToJob(jobId) {
   }, 50);
 }
 
-function handleLogExpense(event) {
+async function handleLogExpense(event) {
   event.preventDefault();
+  const btn = event.submitter;
 
   const jobId = document.getElementById('log-job-id').value;
   const category = document.getElementById('log-category').value;
   const valInput = parseFloat(document.getElementById('log-amount').value) || 0;
-  const dateStr = document.getElementById('log-date').value;
-  const note = document.getElementById('log-note').value.trim();
-
   const targetJob = jobs.find(j => j.id === jobId);
-  if (!targetJob) {
-    showToast('Please select a valid job.');
-    return;
-  }
+  if (!targetJob) { showToast('Please select a valid job.'); return; }
 
-  let finalAmount = valInput;
-  let loggedHours = null;
+  const isLabor = category === 'Labor';
+  if (btn) btn.disabled = true;
+  const { error } = await sb.from('expenses').insert({
+    job_id: jobId,
+    type: TYPE_IN[category],
+    amount_cents: isLabor ? Math.round(valInput * targetJob.hourlyRate * 100) : toCents(valInput),
+    hours: isLabor ? valInput : null,
+    note: document.getElementById('log-note').value.trim(),
+    expense_date: document.getElementById('log-date').value
+  });
+  if (btn) btn.disabled = false;
+  if (error) { showToast('Could not log expense: ' + error.message); return; }
 
-  if (category === 'Labor') {
-    loggedHours = valInput;
-    finalAmount = valInput * (targetJob.hourlyRate || 75);
-  }
-
-  const newExpense = {
-    id: 'exp-' + Date.now(),
-    type: category,
-    amount: finalAmount,
-    hours: loggedHours,
-    note: note,
-    date: dateStr
-  };
-
-  if (!targetJob.expenses) targetJob.expenses = [];
-  targetJob.expenses.push(newExpense);
-
-  saveJobsToStorage();
-
-  // Reset form note & amount
   document.getElementById('log-amount').value = '';
   document.getElementById('log-note').value = '';
-
-  showToast(`Logged ${category === 'Labor' ? loggedHours + ' labor hrs' : formatCurrency(finalAmount)} to ${targetJob.jobName}!`);
-  renderAll();
+  await loadJobs();
+  showToast(`Logged ${isLabor ? valInput + ' labor hrs' : formatCurrency(valInput)} to ${targetJob.jobName}!`);
   switchTab('jobs');
 }
 
-function toggleJobStatus(jobId) {
+async function toggleJobStatus(jobId) {
   const targetJob = jobs.find(j => j.id === jobId);
-  if (targetJob) {
-    targetJob.status = targetJob.status === 'Active' ? 'Completed' : 'Active';
-    saveJobsToStorage();
-    showToast(`Job marked as ${targetJob.status}`);
-    renderAll();
-  }
-}
-
-function simulateReceiptUpload() {
-  const btn = document.getElementById('btn-receipt-upload');
-  btn.innerHTML = '<i class="fa-solid fa-check text-good"></i> Receipt Attached';
-  btn.classList.add('bg-emerald-50', 'text-good', 'border-good');
-  showToast('Receipt image simulated & attached!');
+  if (!targetJob) return;
+  const next = targetJob.status === 'Active' ? 'completed' : 'active';
+  const { error } = await sb.from('jobs').update({
+    status: next,
+    completed_at: next === 'completed' ? new Date().toISOString() : null
+  }).eq('id', jobId);
+  if (error) { showToast('Could not update job: ' + error.message); return; }
+  targetJob.status = next === 'completed' ? 'Completed' : 'Active';
+  showToast(`Job marked as ${targetJob.status}`);
+  renderAll();
 }
 
 
