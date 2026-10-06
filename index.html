@@ -30,9 +30,32 @@
   header {
     padding: 18px 0;
     border-bottom: 1px solid var(--line);
+    background: #ffffff;
+  }
+  .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .logo { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
   .logo span { color: var(--accent); }
+
+  .signin-nav-btn {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 7px 15px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    transition: all 0.2s ease;
+  }
+  .signin-nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    background: #fff;
+  }
 
   /* Hero */
   .hero { padding: 56px 0 36px; }
@@ -203,8 +226,9 @@
 <body>
 
 <header>
-  <div class="wrap">
+  <div class="wrap header-flex">
     <div class="logo">JobTruth<span>.</span></div>
+    <a href="app.html" class="signin-nav-btn">Sign In &rarr;</a>
   </div>
 </header>
 
